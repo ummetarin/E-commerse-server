@@ -42,7 +42,19 @@ async function run() {
     
     //  review
 
-    
+    app.get('/Eachreviews/:id',async (req,res)=>{
+      const id=req.params.id
+      const query={ id : id }
+      const result= await reviewdata.find(query).toArray();
+      res.send(result);
+    })
+
+
+    app.get('/reviews',async (req,res)=>{
+      const result= await reviewdata.find().toArray();
+      res.send(result);
+    })
+
     app.post('/reviews',async (req,res)=>{
       const revitem=req.body;
       const result=await reviewdata.insertOne(revitem)
