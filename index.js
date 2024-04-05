@@ -42,7 +42,13 @@ async function run() {
     
     //  review
 
-   
+    
+    app.post('/reviews',async (req,res)=>{
+      const revitem=req.body;
+      const result=await reviewdata.insertOne(revitem)
+      res.send(result);
+
+    })
 
     // card
 
