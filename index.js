@@ -4,6 +4,8 @@ const cors = require('cors');
 const port=process.env.PORT||5000
 
 require('dotenv').config()
+const stripe=require('stripe')(process.env.STRIP_SECRET_KEY);
+
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -26,6 +28,7 @@ async function run() {
      const dressdata=client.db('Ecomdata').collection('Alldress');
      const carddata=client.db('Ecomdata').collection('carddata');
      const reviewdata=client.db('Ecomdata').collection('revdata');
+     const userdata=client.db('Ecomdata').collection('users');
 
     //  dressdata
     app.get('/dress',async (req,res)=>{
@@ -39,6 +42,13 @@ async function run() {
       const user=await dressdata.findOne(query);
       res.send(user);
      })
+
+     app.post('/dress',async (req,res)=>{
+      const dressitem=req.body;
+      const result=await dressdata.insertOne(dressitem)
+      res.send(result);
+
+    })
     
     //  review
 
@@ -81,6 +91,33 @@ async function run() {
       const result=await carddata.insertOne(cartitem)
       res.send(result);
 
+    })
+    // user
+
+    app.get('/users',async(req,res)=>{
+      const result=await userdata.find().toArray();
+      res.send(result)
+    })
+
+    app.post('/users',async (req,res)=>{
+      const usertitem=req.body;
+      const result=await userdata.insertOne(usertitem)
+      res.send(result);
+
+    })
+
+    // payment
+    app.post('/create_payment',async(req,res)=>{
+      const {price}=req.body;
+      const amount=parseInt(price*100);
+      const paymentIntent=stripe.paymentIntents.create({
+        amount:amount,
+        currency:'usd',
+        payment_method_types:['card'],
+      });
+      res.send({
+        clientSecret:paymentIntent.client_secret
+      });
     })
     
 
